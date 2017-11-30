@@ -7,11 +7,15 @@ app.config['DEBUG'] = True
 
 @app.route("/validate-info")
 def index():
+    # Render the sign up form
     return render_template('signup-form.html', title="User Signup",username = '', username_error = '',
 password = '', pw1_error = '', verify = '', pw2_error = '', email = '', email_error = '')
 
 @app.route("/validate-info", methods=['POST'])
 def validate_info():
+    ########################
+    # Initialize variables #
+    ########################
     username = request.form['username']
     password1 = request.form['password']
     password2 = request.form['verify']
@@ -21,10 +25,9 @@ def validate_info():
     pw1_error = ''
     pw2_error = ''
     email_error = ''
-
-
-    # Validate username
-
+    #####################
+    # Validate username #
+    #####################
     # test lengh of username
     if len(username) == 0:
         username_error = "Please choose a user name"
@@ -35,16 +38,14 @@ def validate_info():
     elif len(username) > 20:
         username_error = "Username must be less than twenty characters"
         username = ''
-
-        
-    
     # check username for spaces
     for char in username:
         if char == " ":
             username_error = "Username can not contain spaces"
             username = ''
-
-    # Validate Password
+    #####################
+    # Validate Password #
+    #####################
     # test length of password
     if len(password1) == 0:
         pw1_error = "Please enter a password"
@@ -66,12 +67,14 @@ def validate_info():
         password1 = ''
         password2 = ''
 
-
-    # validate email
+    ##################
+    # validate email #
+    ##################
     #check format
     required_characters = ['@','.']
-    if '@' not in email or '.' not in email:
-        email_error = "Please input a valid email."
+    if len(email) > 0: 
+        if '@' not in email or '.' not in email:
+            email_error = "Please input a valid email."
     # tests lengh of email
     if len(email) < 3 and len(email) > 0:
         email_error = "Your email must be at least three characters"
@@ -84,10 +87,10 @@ def validate_info():
         if char == " ":
             email_error = "Password can not contain spaces"
             email = ''
-
-
+    ####################################################
+    # If successful redirect. If failure show an error #
+    ####################################################
     if not username_error and not pw1_error and not pw2_error and not email_error:
-        username = request.form['username']
         return redirect('/welcome?username={0}'.format(username))
     else:
         return render_template('signup-form.html',username=username, username_error=username_error,pw1_error=pw1_error,
@@ -95,7 +98,8 @@ def validate_info():
 
 @app.route('/welcome')
 def welcome():
-    username= request.form.get('username')
+    # Pull username from redirect
+    username = request.args.get('username')
     return render_template('welcome.html',username=username)
 
 
